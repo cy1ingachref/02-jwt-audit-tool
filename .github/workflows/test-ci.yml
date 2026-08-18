@@ -1,0 +1,20 @@
+# JWT audit tool — unit tests in CI (zero dependencies, stdlib only).
+name: Tests
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Unit tests
+        run: python -m unittest tests.test_jwt_audit -v
+      - name: Self-test (8 scenarios)
+        run: python jwt_audit.py --self-test
