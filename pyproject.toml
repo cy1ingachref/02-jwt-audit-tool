@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jwt-audit"
+version = "1.0.0"
+description = "Dependency-free JWT security auditor (alg=none, weak HMAC secrets, expiry hygiene)."
+readme = "README.md"
+requires-python = ">=3.7"
+license = { text = "MIT" }
+authors = [{ name = "Your Name" }]
+keywords = ["jwt", "security", "pentest", "appsec", "audit"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Security",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/jwt-audit"
+Repository = "https://github.com/yourusername/jwt-audit"
+
+[project.scripts]
+jwt-audit = "jwt_audit:main"
+
+[tool.setuptools]
+py-modules = ["jwt_audit"]

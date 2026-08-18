@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.pyc
+build/
+dist/
+*.egg-info/
+
+# Generated sample tokens (demo data, reproducible via make_sample_tokens.py)
+sample_*.txt
+
+# OS
+.DS_Store
+Thumbs.db
