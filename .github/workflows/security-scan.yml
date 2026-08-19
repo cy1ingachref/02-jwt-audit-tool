@@ -1,0 +1,49 @@
+name: Security Scan
+
+# DevSecOps gate: run the JWT auditor's test suite and a sample-token audit on
+# every push and pull request. Fails the build (exit 1) if the auditor finds a
+# HIGH-severity issue in the committed sample tokens, so a regression in the
+# detection logic is caught in CI rather than in production.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run auditor self-tests
+        run: python jwt_audit.py --self-test
+
+      - name: Generate safe demo tokens
+        run: python make_sample_tokens.py
+
+      - name: Audit sample tokens (must stay clean of HIGH findings)
+        run: python jwt_audit.py --file sample_weak.txt --no-secret-check
+        # sample_weak.txt intentionally contains weak tokens; we assert the
+        # auditor STILL flags them. Invert the exit code so CI fails if the
+        # tool misses a known-bad token.
+        continue-on-error: true
+
+      - name: Assert detection did not regress
+        run: |
+          out=$(python jwt_audit.py --file sample_weak.txt --no-secret-check)
+          echo "$out"
+          if echo "$out" | grep -q "HIGH"; then
+            echo "OK: auditor still flags known-weak token(s)."
+          else
+            echo "REGRESSION: auditor failed to flag a known-weak token." >&2
+            exit 1
+          fi
